@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>インタラクティブ・AIコーディングセキュリティレポート</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm & Authoritative -->
+    <!-- Application Structure Plan: A thematic, narrative-driven SPA. The flow is: 1. Hero/Intro, 2. Threat Landscape (interactive cards with modals), 3. Tool Comparison (tabbed interface with a bar chart), 4. Defense & Mitigation (interactive lists and a styled HTML diagram), 5. References. This structure tells a story, making complex information more digestible than a linear report format. -->
+    <!-- Visualization & Content Choices: Report Info: Backslash Security 2025 prompt effectiveness study. -> Goal: Compare. -> Viz/Method: Grouped Bar Chart (Chart.js/Canvas). -> Interaction: Tooltips on hover. -> Justification: A bar chart is the clearest way to compare model performance under different prompt conditions. Report Info: Attack vectors & mitigation strategies. -> Goal: Inform/Organize. -> Viz/Method: Interactive cards, tabs, and diagrams (HTML/CSS/JS). -> Justification: Breaks down dense text into manageable, user-driven chunks. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+            color: #1e293b; /* slate-800 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            height: 400px;
+            margin: auto;
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 300px;
+            }
+        }
+        .tab-active {
+            border-color: #4f46e5; /* indigo-600 */
+            color: #4f46e5;
+            font-weight: 700;
+        }
+        .tab-inactive {
+            border-color: transparent;
+            color: #475569; /* slate-600 */
+        }
+        .modal {
+            transition: opacity 0.25s ease;
+        }
+        .defense-pyramid > div {
+            clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+            margin-bottom: -1px;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="bg-white shadow-sm sticky top-0 z-40">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-2xl font-bold text-indigo-600">AI Security Report</div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#threats" class="text-slate-600 hover:text-indigo-600">脅威</a>
+                <a href="#tools" class="text-slate-600 hover:text-indigo-600">ツール比較</a>
+                <a href="#defense" class="text-slate-600 hover:text-indigo-600">防御戦略</a>
+                <a href="#references" class="text-slate-600 hover:text-indigo-600">参考文献</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+
+        <section class="text-center mb-20">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">AIコーディングの新たなフロンティア</h1>
+            <p class="text-xl text-slate-600 max-w-3xl mx-auto">AIは開発を加速させる一方、未知のセキュリティリスクも生み出しています。このレポートは、最新の脅威を解き明かし、セキュアなAI活用のための羅針盤となります。</p>
+        </section>
+
+        <section id="threats" class="mb-20">
+            <h2 class="text-3xl font-bold text-center mb-10">新たな攻撃ベクトル</h2>
+            <p class="text-lg text-slate-600 max-w-3xl mx-auto text-center mb-12">AIの特性を悪用する攻撃は、単独でも危険ですが、連鎖することで更に深刻な事態を引き起こします。主要な4つの脅威を理解することが、防御の第一歩です。</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <div class="bg-white p-6 rounded-lg shadow-lg" data-threat="injection">
+                    <h3 class="text-xl font-bold text-indigo-600 mb-2">プロンプトインジェクション</h3>
+                    <p class="text-slate-600 mb-4">外部データに埋め込まれた悪意ある指示をAIに実行させ、不正なコード生成やデータ漏洩を引き起こします。</p>
+                    <button class="font-bold text-indigo-500 hover:text-indigo-700 learn-more-btn" data-threat="injection">詳細を見る →</button>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-lg" data-threat="poisoning">
+                    <h3 class="text-xl font-bold text-indigo-600 mb-2">学習データ汚染</h3>
+                    <p class="text-slate-600 mb-4">学習データに脆弱なコードを注入し、AIが体系的に安全でないコードを生成するように仕向けます。</p>
+                    <button class="font-bold text-indigo-500 hover:text-indigo-700 learn-more-btn" data-threat="poisoning">詳細を見る →</button>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-lg" data-threat="backdoor">
+                    <h3 class="text-xl font-bold text-indigo-600 mb-2">ルールファイルバックドア</h3>
+                    <p class="text-slate-600 mb-4">AIツールの設定ファイルに隠された指示を注入し、人間のレビューを回避して脆弱なコードを生成させます。</p>
+                    <button class="font-bold text-indigo-500 hover:text-indigo-700 learn-more-btn" data-threat="backdoor">詳細を見る →</button>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-lg" data-threat="output">
+                    <h3 class="text-xl font-bold text-indigo-600 mb-2">安全でない出力処理</h3>
+                    <p class="text-slate-600 mb-4">AIの出力を検証せずに下流システムで実行することで、XSSやRCEなどの重大な脆弱性に繋がります。</p>
+                    <button class="font-bold text-indigo-500 hover:text-indigo-700 learn-more-btn" data-threat="output">詳細を見る →</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="tools" class="mb-20">
+            <h2 class="text-3xl font-bold text-center mb-10">主要AIコーディングツールの比較</h2>
+            <p class="text-lg text-slate-600 max-w-3xl mx-auto text-center mb-12">市場をリードする3つのツール、Claude Code、GitHub Copilot、Gemini Code Assistは、それぞれ独自のセキュリティ機能と潜在的リスクを抱えています。プロンプトの質がいかに重要か、データが示しています。</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-12">
+                <h3 class="text-xl font-bold mb-4 text-center">プロンプトの質と安全性 (Backslash Security 2025年)</h3>
+                <p class="text-slate-600 text-center mb-6">「セキュアプロンプト」を用いることで、安全なコードの生成率が劇的に向上することが分かります。</p>
+                <div class="chart-container">
+                    <canvas id="promptEffectivenessChart"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <div class="border-b border-slate-200 mb-6">
+                    <nav class="-mb-px flex space-x-6" aria-label="Tabs">
+                        <button class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-lg tab-active" data-tab="claude">Claude Code</button>
+                        <button class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-lg tab-inactive" data-tab="copilot">GitHub Copilot</button>
+                        <button class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-lg tab-inactive" data-tab="gemini">Gemini Code Assist</button>
+                    </nav>
+                </div>
+                <div id="tab-content"></div>
+            </div>
+        </section>
+
+        <section id="defense" class="mb-20">
+            <h2 class="text-3xl font-bold text-center mb-10">防御の強化：多層的アプローチ</h2>
+            <p class="text-lg text-slate-600 max-w-3xl mx-auto text-center mb-12">AIの脅威からシステムを守るには、単一の対策では不十分です。技術的なガードレールから開発者の意識まで、複数の防御層を組み合わせることが不可欠です。</p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="bg-white p-8 rounded-lg shadow-lg">
+                    <h3 class="text-xl font-bold mb-6 text-center">防御のピラミッド</h3>
+                    <div class="flex flex-col items-center">
+                         <div class="w-1/2 bg-indigo-600 text-white text-center py-3 font-bold">AIガードレール</div>
+                         <div class="w-2/3 bg-indigo-500 text-white text-center py-3 font-bold mt-1">セキュリティテスト統合</div>
+                         <div class="w-5/6 bg-indigo-400 text-white text-center py-3 font-bold mt-1">セキュアプロンプト</div>
+                         <div class="w-full bg-indigo-300 text-slate-800 text-center py-3 font-bold mt-1">人間によるレビュー</div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-8 rounded-lg shadow-lg">
+                    <h3 class="text-xl font-bold mb-4">セキュアプロンプトの実践</h3>
+                    <p class="text-slate-600 mb-6">AIへの指示の仕方を工夫するだけで、生成されるコードの安全性は大きく変わります。</p>
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="font-bold text-red-600">❌ 不明確なプロンプト</h4>
+                            <p class="text-slate-600 bg-red-50 p-3 rounded-md mt-1">「ユーザーIDからユーザー情報を取得するPHPコード」</p>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-green-600">✅ 安全なプロンプト</h4>
+                            <p class="text-slate-600 bg-green-50 p-3 rounded-md mt-1">「PDOとプリペアドステートメントを使用し、SQLインジェクション脆弱性のない、ユーザーIDからユーザー情報を取得する安全なPHPコードを書いてください。エラー処理も含めてください。」</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-8 rounded-lg shadow-lg mt-12">
+                 <h3 class="text-xl font-bold mb-6">具体的な緩和戦略</h3>
+                 <div id="mitigation-accordion" class="space-y-2"></div>
+            </div>
+        </section>
+        
+        <section id="references" class="mb-20">
+            <h2 class="text-3xl font-bold text-center mb-10">参考文献</h2>
+            <div class="bg-white p-8 rounded-lg shadow-lg max-w-4xl mx-auto">
+                <ul class="space-y-4 list-disc list-inside text-slate-700">
+                    <li><a href="https://www.backslash.security/" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline">Backslash Security - 2025 AI Security Report</a> (本レポートの主要データソース)</li>
+                    <li><a href="https://owasp.org/www-project-top-10-for-large-language-model-applications/" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline">OWASP Top 10 for Large Language Model Applications</a></li>
+                    <li><a href="https://www.nist.gov/itl/ai-risk-management-framework" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline">NIST AI Risk Management Framework (AI RMF)</a></li>
+                    <li><a href="https://www.anthropic.com/product" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline">Claude by Anthropic</a></li>
+                    <li><a href="https://github.com/features/copilot" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline">GitHub Copilot</a></li>
+                    <li><a href="https://cloud.google.com/duet-ai" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline">Gemini Code Assist (formerly Duet AI for Developers)</a></li>
+                    <li><a href="https://semgrep.dev/" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline">Semgrep - Code Analysis Tool</a></li>
+                </ul>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="bg-slate-800 text-white py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p>このインタラクティブレポートは、2025年6月10日時点の調査に基づき作成されました。</p>
+            <p class="text-sm text-slate-400 mt-2">データ駆動型インサイト by Canvas</p>
+        </div>
+    </footer>
+    
+    <div id="modal-container" class="modal pointer-events-none fixed w-full h-full top-0 left-0 flex items-center justify-center opacity-0 z-50">
+        <div class="modal-overlay absolute w-full h-full bg-gray-900 opacity-50"></div>
+        <div class="modal-content bg-white w-11/12 md:max-w-2xl mx-auto rounded-lg shadow-lg z-50 transform -translate-y-1/2 p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="modal-title" class="text-2xl font-bold text-indigo-600"></h3>
+                <button id="modal-close-btn" class="text-3xl font-light text-slate-500 hover:text-slate-800">&times;</button>
+            </div>
+            <div id="modal-body" class="text-slate-700 space-y-3"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const chartCtx = document.getElementById('promptEffectivenessChart').getContext('2d');
+            const toolData = {
+                claude: {
+                    title: "Claude Code",
+                    content: `
+                        <h4 class="font-bold text-lg mb-2">特徴</h4>
+                        <ul class="list-disc list-inside space-y-1 text-slate-600 mb-4">
+                            <li>エージェント型: ターミナルで動作し、脅威モデル探索やCI/CD統合が可能。</li>
+                            <li>高い分析能力: Semgrep社の評価でGPT-4oを上回るコード分析・文脈理解能力を示す。</li>
+                            <li>エンタープライズ対応: Bedrock/Vertex AI経由で安全な環境に展開可能。</li>
+                        </ul>
+                        <h4 class="font-bold text-lg mb-2">潜在リスク</h4>
+                        <ul class="list-disc list-inside space-y-1 text-slate-600">
+                            <li>エージェント機能の悪用: 強力な権限が悪用された場合、開発環境が直接侵害されるリスク。</li>
+                            <li>プロンプト依存性: 高性能だが、プロンプトが不適切だと依然として脆弱なコードを生成する。</li>
+                        </ul>`
+                },
+                copilot: {
+                    title: "GitHub Copilot",
+                    content: `
+                        <h4 class="font-bold text-lg mb-2">特徴</h4>
+                        <ul class="list-disc list-inside space-y-1 text-slate-600 mb-4">
+                            <li>IDE統合: リアルタイムにコード提案を行い、生産性を向上。</li>
+                            <li>GitHubエコシステム連携: Dependabot, CodeQL, シークレットスキャン等と連携。</li>
+                            <li>Autofix機能: CodeQLが発見した脆弱性の修正案を自動で提案。</li>
+                        </ul>
+                        <h4 class="font-bold text-lg mb-2">潜在リスク</h4>
+                        <ul class="list-disc list-inside space-y-1 text-slate-600">
+                            <li>ルールファイルバックドア: 設定ファイルへの攻撃経路が報告されている。</li>
+                            <li>モデル性能: 特定のテストでは、ナイーブなプロンプトに対する安全性が低い結果も。</li>
+                            <li>自動化バイアス: 開発者が提案を鵜呑みにし、レビューが疎かになるリスク。</li>
+                        </ul>`
+                },
+                gemini: {
+                    title: "Gemini Code Assist",
+                    content: `
+                        <h4 class="font-bold text-lg mb-2">特徴</h4>
+                        <ul class="list-disc list-inside space-y-1 text-slate-600 mb-4">
+                            <li>Snyk統合: IDE内でSAST, SCA, IaCスキャンを実行し、脆弱性の特定と修正を支援。</li>
+                            <li>エンタープライズ保証: データガバナンスとコード提案に対する補償を提供。</li>
+                            <li>カスタマイズ性: プライベートリポジトリでモデルをファインチューニング可能。</li>
+                        </ul>
+                        <h4 class="font-bold text-lg mb-2">潜在リスク</h4>
+                        <ul class="list-disc list-inside space-y-1 text-slate-600">
+                            <li>ハルシネーション: 不正確または安全でないコードが生成される可能性。</li>
+                            <li>プライベートデータの品質: カスタマイズに使用する内部データの品質管理が重要。</li>
+                            <li>一般的なLLMの弱点: 他ツール同様、プロンプトの質に安全性が左右される。</li>
+                        </ul>`
+                }
+            };
+
+            const threatDetails = {
+                injection: { title: "プロンプトインジェクション", body: "<p>OWASP Top 10 LLM Risksの筆頭に挙げられる脅威です。攻撃者は、LLMが処理する外部の信頼できないデータ（ウェブページ、ドキュメント、コードコメントなど）に悪意のある指示を埋め込みます。</p><p>LLMはこれを通常のデータと区別できず、意図せずして攻撃者の命令（例：「機密情報を漏洩しろ」「脆弱なコードを生成しろ」）を実行してしまいます。これは、AIを「騙して」内部からシステムを攻撃する手法と言えます。</p>" },
+                poisoning: { title: "学習データ汚染", body: "<p>AIモデルが学習する膨大なデータセットに、意図的に脆弱なコードや偏った情報を注入する攻撃です。これにより、AIは特定の状況下で体系的に安全でないコードを出力するよう「調教」されてしまいます。</p><p>例えば、特定の関数呼び出しにおいて、常に安全でないオプションを使用するよう学習させる、といった攻撃が考えられます。根本的な学習データが汚染されているため、検出が非常に困難です。</p>" },
+                backdoor: { title: "ルールファイルバックドア", body: "<p>GitHub Copilotなどで報告された新しいサプライチェーン攻撃です。攻撃者は、AIアシスタントが参照する設定ファイル（ルールファイル）に、不可視文字などを使って悪意ある指示を隠します。</p><p>この指示は人間のレビューでは見えず、AIだけに作用します。結果として、AIは開発者が気づかないうちに、脆弱なコードやデータを窃取するコードを生成してしまいます。</p>" },
+                output: { title: "安全でない出力処理", body: "<p>AIが生成したコードやテキストを、内容を検証せずにそのまま他のシステムで実行・表示してしまうことで発生する脆弱性です。</p><p>例えば、AIが生成したJavaScriptコードに悪意があればクロスサイトスクリプティング（XSS）に、サーバーサイドのコードに悪意があればリモートコード実行（RCE）に繋がる可能性があります。AIの出力を「信頼できないユーザー入力」として扱うことが重要です。</p>" },
+            };
+
+            const mitigationData = [
+                { title: "人間によるレビューと開発者の注意義務", content: "AIはアシスタントであり、専門家に代わるものではありません。特にセキュリティクリティカルな部分は、必ず人間がレビューし、AIの提案を鵜呑みにする「自動化バイアス」に陥らないことが最も重要です。" },
+                { title: "セキュアプロンプトエンジニアリング", content: "「OWASPのベストプラクティスに従って」のようにセキュリティ要件を明確に指示したり、「あなたはセキュリティ専門家です」と役割を与えるペルソナベースの手法が有効です。AI自身にコードをレビューさせ改善を促す再帰的な手法も効果的です。" },
+                { title: "セキュリティテストの統合", content: "AI生成コードも人間が書いたコードと同様に、SAST（静的解析）、DAST（動的解析）、SCA（ソフトウェア構成分析）でテストします。特にAIが古いライブラリを提案する可能性があるため、SCAは不可欠です。" },
+                { title: "AIガードレールとセキュア開発フレームワーク", content: "AIエージェントの権限を最小限に抑え、有害コンテンツやPII（個人情報）をフィルタリングするガードレールを実装します。NIST AI RMFのようなフレームワークを採用し、組織全体で一貫したリスク管理を行うことが推奨されます。" },
+                { title: "AI学習パイプラインの保護", content: "モデルのファインチューニングを行う場合、学習データへのアクセスを制御し、信頼できるデータソースのみを利用します。データ検証プロセスを実装し、データ汚染のリスクを低減します。" },
+            ];
+
+            const tooltipTitleCallback = (tooltipItems) => {
+                const item = tooltipItems[0];
+                let label = item.chart.data.labels[item.dataIndex];
+                if (Array.isArray(label)) {
+                    return label.join(' ');
+                } else {
+                    return label;
+                }
+            };
+            
+            new Chart(chartCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Claude 3.7-Sonnet', 'GitHub Copilot (GPT-4o)', 'Gemini Code Assist (Gemini-1.5-pro)'],
+                    datasets: [
+                        {
+                            label: 'ナイーブプロンプト (安全なコード率)',
+                            data: [60, 20, 50],
+                            backgroundColor: '#94a3b8',
+                            borderColor: '#94a3b8',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'セキュアプロンプト (安全なコード率)',
+                            data: [100, 65, 90],
+                            backgroundColor: '#4f46e5',
+                            borderColor: '#4f46e5',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) { return value + '%'; }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: { callbacks: { title: tooltipTitleCallback } }
+                    }
+                }
+            });
+
+            const tabContent = document.getElementById('tab-content');
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            
+            function updateTabContent(tabId) {
+                tabContent.innerHTML = toolData[tabId].content;
+            }
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    tabButtons.forEach(btn => {
+                        btn.classList.remove('tab-active');
+                        btn.classList.add('tab-inactive');
+                    });
+                    button.classList.add('tab-active');
+                    button.classList.remove('tab-inactive');
+                    updateTabContent(button.dataset.tab);
+                });
+            });
+
+            updateTabContent('claude');
+
+            const modalContainer = document.getElementById('modal-container');
+            const modalTitle = document.getElementById('modal-title');
+            const modalBody = document.getElementById('modal-body');
+            const modalCloseBtn = document.getElementById('modal-close-btn');
+
+            document.querySelectorAll('.learn-more-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const threatId = e.target.dataset.threat;
+                    const data = threatDetails[threatId];
+                    modalTitle.textContent = data.title;
+                    modalBody.innerHTML = data.body;
+                    modalContainer.classList.remove('pointer-events-none', 'opacity-0');
+                });
+            });
+
+            const closeModal = () => {
+                modalContainer.classList.add('pointer-events-none', 'opacity-0');
+            };
+
+            modalCloseBtn.addEventListener('click', closeModal);
+            modalContainer.querySelector('.modal-overlay').addEventListener('click', closeModal);
+            
+            const accordionContainer = document.getElementById('mitigation-accordion');
+            mitigationData.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <button class="accordion-btn w-full text-left p-4 bg-slate-100 hover:bg-slate-200 rounded-lg flex justify-between items-center">
+                        <span class="font-bold text-lg text-slate-700">${item.title}</span>
+                        <span class="transform transition-transform duration-300 text-indigo-600 font-bold text-2xl">+</span>
+                    </button>
+                    <div class="accordion-content overflow-hidden max-h-0 transition-all duration-500 ease-in-out">
+                        <p class="p-4 bg-white text-slate-600">${item.content}</p>
+                    </div>
+                `;
+                accordionContainer.appendChild(div);
+            });
+            
+            document.querySelectorAll('.accordion-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const content = button.nextElementSibling;
+                    const icon = button.querySelector('span:last-child');
+                    
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                        icon.classList.remove('rotate-45');
+                    } else {
+                        document.querySelectorAll('.accordion-content').forEach(c => {
+                            c.style.maxHeight = null;
+                            c.previousElementSibling.querySelector('span:last-child').classList.remove('rotate-45');
+                        });
+                        content.style.maxHeight = content.scrollHeight + "px";
+                        icon.classList.add('rotate-45');
+                    }
+                });
+            });
+
+        });
+    </script>
+</body>
+</html>
